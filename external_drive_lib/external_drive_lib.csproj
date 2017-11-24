@@ -42,6 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Native\DialogMoveThread.cs" />
+    <Compile Include="Native\EnumThreadWndProc.cs" />
+    <Compile Include="Native\NativeMethods.cs" />
+    <Compile Include="Native\Win32Windows.cs" />
     <Compile Include="portable\portable_drive.cs" />
     <Compile Include="portable\portable_file.cs" />
     <Compile Include="portable\portable_folder.cs" />
@@ -55,9 +59,7 @@
     <Compile Include="monitor\find_devices.cs" />
     <Compile Include="monitor\monitor_devices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="util\enum_process_windows.cs" />
     <Compile Include="util\usb_util.cs" />
-    <Compile Include="util\win32_util.cs" />
     <Compile Include="windows\win_drive.cs" />
     <Compile Include="windows\win_file.cs" />
     <Compile Include="windows\win_folder.cs" />
