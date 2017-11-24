@@ -25,3 +25,4 @@ $RECYCLE.BIN/
 *.lnk
 
 */.vs/*
+/.vs
