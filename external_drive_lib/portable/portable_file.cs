@@ -12,8 +12,8 @@ namespace external_drive_lib.portable
     internal class portable_file : IFile
     {
         private FolderItem2 fi_;
-        private portable_drive drive_;
-        public portable_file(portable_drive drive, FolderItem2 fi) {
+        private PortableDevice drive_;
+        public portable_file(PortableDevice drive, FolderItem2 fi) {
             drive_ = drive;
             fi_ = fi;
             Debug.Assert(!fi.IsFolder);
@@ -35,7 +35,7 @@ namespace external_drive_lib.portable
                 try {
                     if (drive.is_available()) {
                         // if this throws, drive exists, but file does not
-                        drive_root.inst.parse_file(full_path);
+                        PortableDriveRoot.inst.parse_file(full_path);
                         return true;
                     }
                 } catch {
@@ -71,7 +71,7 @@ namespace external_drive_lib.portable
         }
 
         public void copy_async(string dest_path) {
-            var dest = drive_root.inst.parse_folder(dest_path) as IFolder2;
+            var dest = PortableDriveRoot.inst.parse_folder(dest_path) as IFolder2;
             if ( dest != null)
                 dest.copy_file(this, false);
             else 
@@ -84,7 +84,7 @@ namespace external_drive_lib.portable
         }
 
         public void copy_sync(string dest_path) {
-            var dest = drive_root.inst.parse_folder(dest_path) as IFolder2;
+            var dest = PortableDriveRoot.inst.parse_folder(dest_path) as IFolder2;
             if ( dest != null)
                 dest.copy_file(this, true);
             else 

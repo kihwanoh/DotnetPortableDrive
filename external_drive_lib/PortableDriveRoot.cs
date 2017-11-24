@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using external_drive_lib.exceptions;
 using external_drive_lib.interfaces;
 using external_drive_lib.monitor;
 using external_drive_lib.portable;
@@ -18,9 +17,9 @@ namespace external_drive_lib
 {
     /* the root - the one that contains all external drives 
      */
-    public class drive_root {
+    public class PortableDriveRoot {
 
-        public static drive_root inst { get; } = new drive_root();
+        public static PortableDriveRoot inst { get; } = new PortableDriveRoot();
 
         private bool auto_close_win_dialogs_ = true;
 
@@ -30,7 +29,7 @@ namespace external_drive_lib
         
         private Dictionary<string,string> vidpid_to_unique_id_ = new Dictionary<string, string>();
 
-        private drive_root() {
+        private PortableDriveRoot() {
             var existing_devices = find_devices.find_objects("Win32_USBHub");
             foreach (var device in existing_devices) {
                 if (device.ContainsKey("PNPDeviceID")) {
@@ -85,7 +84,7 @@ namespace external_drive_lib
             refresh_portable_unique_ids();
             var already_a_drive = false;
             lock (this) {
-                var ad = drives_.FirstOrDefault(d => d.unique_id == unique_id) as portable_drive;
+                var ad = drives_.FirstOrDefault(d => d.unique_id == unique_id) as PortableDevice;
                 if (ad != null) {
                     ad.connected_via_usb = true;
                     already_a_drive = true;
@@ -97,7 +96,7 @@ namespace external_drive_lib
 
         private void on_deleted_device(string vid_pid, string unique_id) {            
             lock (this) {
-                var ad = drives_.FirstOrDefault(d => d.unique_id == unique_id) as portable_drive;
+                var ad = drives_.FirstOrDefault(d => d.unique_id == unique_id) as PortableDevice;
                 if (ad != null)
                     ad.connected_via_usb = false;
             }
@@ -137,7 +136,7 @@ namespace external_drive_lib
         private void monitor_for_drive(string vidpid, int idx) {
             const int MAX_RETRIES = 10;
             var drives_now = get_portable_drives();
-            var found = drives_now.FirstOrDefault(d => (d as portable_drive).vid_pid == vidpid);
+            var found = drives_now.FirstOrDefault(d => (d as PortableDevice).vid_pid == vidpid);
             if (found != null) 
                 refresh();
             else if (idx < MAX_RETRIES)
@@ -194,7 +193,7 @@ namespace external_drive_lib
 
         private void refresh_portable_unique_ids() {
             lock(this)
-                foreach ( portable_drive ad in drives_.OfType<portable_drive>())
+                foreach ( PortableDevice ad in drives_.OfType<PortableDevice>())
                     if ( vidpid_to_unique_id_.ContainsKey(ad.vid_pid))
                         ad.unique_id = vidpid_to_unique_id_[ad.vid_pid];
         }
@@ -332,10 +331,10 @@ namespace external_drive_lib
 
 
         private List<IDrive> get_portable_drives() {
-            var new_drives = portable_util. get_portable_connected_device_drives().Select(d => new portable_drive(d) as IDrive).ToList();
+            var new_drives = portable_util. get_portable_connected_device_drives().Select(d => new PortableDevice(d) as IDrive).ToList();
             List<IDrive> old_drives = null;
             lock (this)
-                old_drives = drives_.Where(d => d is portable_drive).ToList();
+                old_drives = drives_.Where(d => d is PortableDevice).ToList();
 
             // if we already have this drive, reuse that
             List<IDrive> result = new List<IDrive>();

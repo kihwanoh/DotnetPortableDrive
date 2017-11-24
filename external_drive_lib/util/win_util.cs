@@ -84,7 +84,7 @@ namespace external_drive_lib.windows
             long cur_size = -1;
             for (int i = 0; i < retry_count ; ++i) {
                 try {
-                    cur_size = drive_root.inst.parse_file(full_file_name).size;
+                    cur_size = PortableDriveRoot.inst.parse_file(full_file_name).size;
                 } catch {
                 }
                 if ( cur_size < size)
@@ -162,7 +162,7 @@ namespace external_drive_lib.windows
                 // therefore, lets find out if the original Folder still exists
                 try {
                     // if this doesn't throw, the folder is still not fully moved
-                    drive_root.inst.parse_folder(old_full_path);
+                    PortableDriveRoot.inst.parse_folder(old_full_path);
                 } catch {
                     return;
                 }

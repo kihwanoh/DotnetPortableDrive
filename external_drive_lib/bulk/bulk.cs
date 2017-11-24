@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using external_drive_lib.exceptions;
 using external_drive_lib.interfaces;
 using external_drive_lib.portable;
 using external_drive_lib.windows;
@@ -20,12 +19,12 @@ namespace external_drive_lib.bulk
         //
         // callback - it's called after each file is copied. Args: the file, its index, number of files for total copy
         public static void bulk_copy_sync(string src_folder, string dest_folder, Action<string,int,int> copy_complete_callback = null) {
-            bulk_copy_sync( drive_root.inst.parse_folder(src_folder).files.ToList(), dest_folder, copy_complete_callback);
+            bulk_copy_sync( PortableDriveRoot.inst.parse_folder(src_folder).files.ToList(), dest_folder, copy_complete_callback);
         }
 
         // callback - it's called after each file is copied. Args: the file, its index, number of files for total copy
         public static void bulk_copy_async(string src_folder, string dest_folder, Action<string,int,int> copy_complete_callback = null) {
-            bulk_copy_async( drive_root.inst.parse_folder(src_folder).files.ToList(), dest_folder, copy_complete_callback);
+            bulk_copy_async( PortableDriveRoot.inst.parse_folder(src_folder).files.ToList(), dest_folder, copy_complete_callback);
         }
 
         // callback - it's called after each file is copied. Args: the file, its index, number of files for total copy
@@ -69,7 +68,7 @@ namespace external_drive_lib.bulk
             dest_folder_name = dest_folder_name.Replace("/", "\\");
             Debug.Assert(!dest_folder_name.EndsWith("\\"));
             // in case destination does not exist, create it
-            drive_root.inst.new_folder(dest_folder_name);
+            PortableDriveRoot.inst.new_folder(dest_folder_name);
 
             Dictionary<string, List<IFile>> files_by_folder = new Dictionary<string, List<IFile>>();
             foreach (var f in src_files) {
@@ -79,7 +78,7 @@ namespace external_drive_lib.bulk
                 files_by_folder[path].Add(f);
             }
 
-            var dest_folder = drive_root.inst.parse_folder(dest_folder_name);
+            var dest_folder = PortableDriveRoot.inst.parse_folder(dest_folder_name);
             var all_src_win = src_files.All(f => f is win_file);
             if (all_src_win && dest_folder is win_folder) {
                 bulk_copy_win( src_files.Select(f => (f as win_file).full_path).ToList(), dest_folder_name, synchronous, copy_complete_callback);
@@ -143,7 +142,7 @@ namespace external_drive_lib.bulk
 
         private static void wait_for_copy_complete(List<copy_file_info> src_files, int count, ref int idx, string dest_folder_name, Action<string,int,int> copy_complete_callback) {
             Debug.Assert(src_files.Count > 0);
-            var dest_folder = drive_root.inst.parse_folder(dest_folder_name);
+            var dest_folder = PortableDriveRoot.inst.parse_folder(dest_folder_name);
             var dest_android = dest_folder is portable_folder;
             var dest_win = dest_folder is win_folder;
             Debug.Assert(dest_android || dest_win);

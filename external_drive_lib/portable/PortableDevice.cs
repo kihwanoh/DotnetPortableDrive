@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using external_drive_lib.exceptions;
 using external_drive_lib.interfaces;
 using external_drive_lib.util;
 using Shell32;
 
 namespace external_drive_lib.portable
 {
-    internal class portable_drive : IDrive {
-        private const int RETRY_TIMES = 5;
-        private const int SLEEP_BEFORE_RETRY_MS = 200;
-
+    internal class PortableDevice : IDrive {
         private FolderItem root_;
         private drive_type drive_type_;
 
@@ -35,7 +31,7 @@ namespace external_drive_lib.portable
 
         private bool connected_via_usb_ = true;
 
-        public portable_drive(FolderItem fi) {
+        public PortableDevice(FolderItem fi) {
             root_ = fi;
             friendly_name_ = root_.Name;
             root_path_ = root_.Path;

@@ -36,10 +36,10 @@ namespace external_drive_lib.Native
             var processedWindows = new HashSet<IntPtr>();
             while (_isWorking)
             {
-                var checkSleepMs = drive_root.inst.auto_close_win_dialogs ? 50 : 500;
+                var checkSleepMs = PortableDriveRoot.inst.auto_close_win_dialogs ? 50 : 500;
                 Thread.Sleep(checkSleepMs);
 
-                if (!drive_root.inst.auto_close_win_dialogs) continue;
+                if (!PortableDriveRoot.inst.auto_close_win_dialogs) continue;
                 foreach (var w in Win32Windows.GetAllTopWindows())
                 {
                     // already processed window handle

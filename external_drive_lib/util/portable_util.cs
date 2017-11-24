@@ -12,7 +12,7 @@ namespace external_drive_lib.util
     internal static class portable_util
     {
 
-        public static void enumerate_children(portable_drive drive, FolderItem fi, List<IFolder> folders, List<IFile> files) {
+        public static void enumerate_children(PortableDevice drive, FolderItem fi, List<IFolder> folders, List<IFile> files) {
             folders.Clear();
             files.Clear();
 

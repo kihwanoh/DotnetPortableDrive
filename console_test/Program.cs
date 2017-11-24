@@ -25,7 +25,7 @@ namespace console_test
 
         static void example_show_all_portable_drives() {
             Console.WriteLine("Enumerating Portable Drives:");
-            var portable_drives = drive_root.inst.drives.Where(d => d.type.is_portable()).ToList();
+            var portable_drives = PortableDriveRoot.inst.drives.Where(d => d.type.is_portable()).ToList();
             foreach ( var pd in portable_drives)
                 Console.WriteLine("Drive Unique ID: " + pd.unique_id + ", friendly name=" + pd.friendly_name 
                     + ", type=" + pd.type + ", available=" + pd.is_available());
@@ -67,7 +67,7 @@ namespace console_test
 
         static void example_traverse_first_portable_drive(bool dump_file_count_only) {
             Console.WriteLine("Traversing First Portable Drive");
-            var portable_drives = drive_root.inst.drives.Where(d => d.type.is_portable()).ToList();
+            var portable_drives = PortableDriveRoot.inst.drives.Where(d => d.type.is_portable()).ToList();
             if (portable_drives.Count > 0) 
                 traverse_drive(portable_drives[0], dump_file_count_only);
             else
@@ -76,8 +76,8 @@ namespace console_test
 
         static void example_enumerate_all_android_albums() {
             Console.WriteLine("Enumerating all albums on First Android Drive");
-            if (drive_root.inst.drives.Any(d => d.type.is_android())) {
-                foreach ( var folder in drive_root.inst.parse_folder("[a0]:/*/dcim").child_folders)
+            if (PortableDriveRoot.inst.drives.Any(d => d.type.is_android())) {
+                foreach ( var folder in PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim").child_folders)
                     Console.WriteLine(folder.name + " - " + folder.files.Count() + " files");
             }
             else 
@@ -87,7 +87,7 @@ namespace console_test
         // 1.2.4+ we have callbacks - called after each file is copied
         static void example_bulk_copy_all_camera_photos_to_hdd() {
             Console.WriteLine("Copying all photos you took on your first Android device");
-            var camera = drive_root.inst.try_parse_folder("[a0]:/*/dcim/camera");
+            var camera = PortableDriveRoot.inst.try_parse_folder("[a0]:/*/dcim/camera");
             if (camera != null) {
                 DateTime start = DateTime.Now;
                 var temp = new_temp_path();
@@ -106,7 +106,7 @@ namespace console_test
          */
         static void example_copy_all_camera_photos_to_hdd_with_progress() {
             Console.WriteLine("Copying all photos you took on your first Android device");
-            var camera = drive_root.inst.try_parse_folder("[a0]:/*/dcim/camera");
+            var camera = PortableDriveRoot.inst.try_parse_folder("[a0]:/*/dcim/camera");
             if (camera != null) {
                 var temp = new_temp_path();
                 DateTime start = DateTime.Now;
@@ -125,7 +125,7 @@ namespace console_test
 
         static void example_copy_latest_photo_to_hdd() {
             Console.WriteLine("Copying latest photo from your Android device to HDD");    
-            var camera = drive_root.inst.try_parse_folder("[a0]:/*/dcim/camera");
+            var camera = PortableDriveRoot.inst.try_parse_folder("[a0]:/*/dcim/camera");
             if (camera != null) {
                 var temp = new_temp_path();
                 var files = camera.files.OrderBy(f => f.last_write_time).ToList();
@@ -144,7 +144,7 @@ namespace console_test
 
         static void example_find_biggest_photo_in_size() {
             Console.WriteLine("Copying latest photo from your Android device to HDD");    
-            var camera = drive_root.inst.try_parse_folder("[a0]:/*/dcim/camera");
+            var camera = PortableDriveRoot.inst.try_parse_folder("[a0]:/*/dcim/camera");
             if (camera != null) {
                 var files = camera.files.ToList();
                 if (files.Count > 0) {
@@ -202,7 +202,7 @@ namespace console_test
 
         static void example_find_biggest_file_on_first_portable_device() {
             Console.WriteLine("Findind biggest file on First Portable Device");
-            var portable_drives = drive_root.inst.drives.Where(d => d.type.is_portable()).ToList();
+            var portable_drives = PortableDriveRoot.inst.drives.Where(d => d.type.is_portable()).ToList();
             if (portable_drives.Count > 0 ) {
                 if (portable_drives[0].is_available()) {
                     var biggest = get_biggest_file(portable_drives[0]);
@@ -220,13 +220,13 @@ namespace console_test
         static void example_wait_for_first_connected_device() {
             Console.WriteLine("Waiting for you to plug the first portable device");
             while (true) {
-                var portable_drives = drive_root.inst.drives.Where(d => d.type.is_portable());
+                var portable_drives = PortableDriveRoot.inst.drives.Where(d => d.type.is_portable());
                 if (portable_drives.Any())
                     break;
             }
             Console.WriteLine("Waiting for you to make the device availble");
             while (true) {
-                var d = drive_root.inst.try_get_drive("[p0]:/");
+                var d = PortableDriveRoot.inst.try_get_drive("[p0]:/");
                 if (d != null && d.is_available())
                     break;
             }

@@ -46,13 +46,12 @@
     <Compile Include="Native\EnumThreadWndProc.cs" />
     <Compile Include="Native\NativeMethods.cs" />
     <Compile Include="Native\Win32Windows.cs" />
-    <Compile Include="portable\portable_drive.cs" />
+    <Compile Include="portable\PortableDevice.cs" />
     <Compile Include="portable\portable_file.cs" />
     <Compile Include="portable\portable_folder.cs" />
     <Compile Include="util\portable_util.cs" />
     <Compile Include="bulk\bulk.cs" />
-    <Compile Include="drive_root.cs" />
-    <Compile Include="exceptions\exception.cs" />
+    <Compile Include="PortableDriveRoot.cs" />
     <Compile Include="interfaces\IDrive.cs" />
     <Compile Include="interfaces\IFile.cs" />
     <Compile Include="interfaces\IFolder.cs" />

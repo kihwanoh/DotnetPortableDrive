@@ -14,13 +14,13 @@ namespace external_drive_lib.portable
     internal class portable_folder : IFolder2 {
 
         private FolderItem fi_;
-        private portable_drive drive_;
+        private PortableDevice drive_;
 
         private bool enumerated_children_ = false;
         private List<IFolder> folders_ = new List<IFolder>();
         private List<IFile> files_ = new List<IFile>();
 
-        public portable_folder(portable_drive drive,FolderItem fi) {
+        public portable_folder(PortableDevice drive,FolderItem fi) {
             drive_ = drive;
             fi_ = fi;
             Debug.Assert(fi.IsFolder);
@@ -33,7 +33,7 @@ namespace external_drive_lib.portable
                 try {
                     if (drive.is_available()) {
                         // if this throws, drive exists, but folder does not
-                        drive_root.inst.parse_folder(full_path);
+                        PortableDriveRoot.inst.parse_folder(full_path);
                         return true;
                     }
                 } catch {

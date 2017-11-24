@@ -39,7 +39,7 @@ namespace external_drive_lib.windows
         public DateTime last_write_time => new FileInfo(full_path).LastWriteTime;
 
         public void copy_async(string dest_path) {
-            var dest = drive_root.inst.parse_folder(dest_path) as IFolder2;
+            var dest = PortableDriveRoot.inst.parse_folder(dest_path) as IFolder2;
             if ( dest != null)
                 dest.copy_file(this, false);
             else 
@@ -47,7 +47,7 @@ namespace external_drive_lib.windows
         }
 
         public void copy_sync(string dest_path) {
-            var dest = drive_root.inst.parse_folder(dest_path) as IFolder2;
+            var dest = PortableDriveRoot.inst.parse_folder(dest_path) as IFolder2;
             if ( dest != null)
                 dest.copy_file(this, true);
             else 

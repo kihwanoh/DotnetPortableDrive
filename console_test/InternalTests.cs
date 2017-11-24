@@ -66,18 +66,18 @@ namespace console_test
 
         // these are files from my drive
         static void test_win_parse_files() {
-            Debug.Assert(drive_root.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").size == 4532595);
-            Debug.Assert(drive_root.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_104952.jPg").size == 7389360);
-            Debug.Assert(drive_root.inst.parse_folder("D:\\cool_pics\\a10").files.Count() == 25);
-            Debug.Assert(drive_root.inst.parse_folder("D:\\cool_pics").child_folders.Count() == 8);
+            Debug.Assert(PortableDriveRoot.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").size == 4532595);
+            Debug.Assert(PortableDriveRoot.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_104952.jPg").size == 7389360);
+            Debug.Assert(PortableDriveRoot.inst.parse_folder("D:\\cool_pics\\a10").files.Count() == 25);
+            Debug.Assert(PortableDriveRoot.inst.parse_folder("D:\\cool_pics").child_folders.Count() == 8);
 
-            Debug.Assert(drive_root.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").full_path == "D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg");
-            Debug.Assert(drive_root.inst.parse_folder("D:\\cool_pics\\a10").full_path == "D:\\cool_pics\\a10");
+            Debug.Assert(PortableDriveRoot.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").full_path == "D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg");
+            Debug.Assert(PortableDriveRoot.inst.parse_folder("D:\\cool_pics\\a10").full_path == "D:\\cool_pics\\a10");
         }
 
         static void test_parent_folder() {
-            Debug.Assert(drive_root.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").folder.full_path == "D:\\cool_pics\\a00\\b0\\c0");
-            Debug.Assert(drive_root.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").folder.parent.full_path == "D:\\cool_pics\\a00\\b0");
+            Debug.Assert(PortableDriveRoot.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").folder.full_path == "D:\\cool_pics\\a00\\b0\\c0");
+            Debug.Assert(PortableDriveRoot.inst.parse_file("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").folder.parent.full_path == "D:\\cool_pics\\a00\\b0");
         }
 
 
@@ -85,9 +85,9 @@ namespace console_test
         // Android tests
 
         static void android_test_parse_files() {
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").size == 4598747);
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/camera/20171005_121601.jPg").size == 3578988);
-            Debug.Assert(drive_root.inst.parse_folder("[a0]:/*/dcim/camera") != null);
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").size == 4598747);
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/camera/20171005_121601.jPg").size == 3578988);
+            Debug.Assert(PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim/camera") != null);
 
             //            Debug.Assert(drive_root.inst.parse_folder("[a0]:/*/dcim/camera").full_path.ToLower() == "[a0]:/*\\dcim\\camera");
         }
@@ -97,24 +97,24 @@ namespace console_test
             Debug.Assert(false);
 
             // ... uses file.parent
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").folder.full_path.ToLower() 
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").folder.full_path.ToLower() 
                          == "[a0]:/*\\dcim\\camera");
             // ... uses file.parent and folder.parent
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").folder.parent.full_path.ToLower() 
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").folder.parent.full_path.ToLower() 
                          == "[a0]:/*\\dcim");
 
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").full_path.ToLower() 
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/camera/20171005_121557.jPg").full_path.ToLower() 
                          == "[a0]:/*\\dcim\\camera\\20171005_121557.jpg");
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/camera/20171005_121601.jPg").full_path.ToLower() 
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/camera/20171005_121601.jPg").full_path.ToLower() 
                          == "[a0]:/*\\dcim\\camera\\20171005_121601.jpg");            
 
         }
 
         static void android_test_create_delete_folder() {
-            Debug.Assert(drive_root.inst.new_folder("[a0]:/*/dcim/testing123") != null);
-            drive_root.inst.parse_folder("[a0]:/*/dcim/testing123").delete_sync();
+            Debug.Assert(PortableDriveRoot.inst.new_folder("[a0]:/*/dcim/testing123") != null);
+            PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim/testing123").delete_sync();
             try {
-                drive_root.inst.parse_folder("[a0]:/*/dcim/testing123");
+                PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim/testing123");
                 Debug.Assert(false);
 
             } catch {
@@ -123,7 +123,7 @@ namespace console_test
         }
 
         static void android_test_copy_and_delete_file() {
-            var camera = drive_root.inst.parse_folder("[a0]:/*/dcim/camera");
+            var camera = PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim/camera");
             var first_file = camera.files.ToList()[0];
             first_file.copy_sync(camera.parent.full_path);
 
@@ -136,8 +136,8 @@ namespace console_test
             // copy: windows to android
             var renamed = dir + "\\" + name + ".renamed.jpg";
             File.Move(dir + "\\" + name, renamed);
-            drive_root.inst.parse_file(renamed).copy_sync("[a0]:/*/dcim/");
-            Debug.Assert(first_file.size == drive_root.inst.parse_file("[a0]:/*/dcim/" + name + ".renamed.jpg").size);
+            PortableDriveRoot.inst.parse_file(renamed).copy_sync("[a0]:/*/dcim/");
+            Debug.Assert(first_file.size == PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/" + name + ".renamed.jpg").size);
         }
 
 
@@ -149,7 +149,7 @@ namespace console_test
         static void android_test_copy_full_dir_to_windows() {
             DateTime start = DateTime.Now;
             var dest_dir = new_temp_path();
-            var camera = drive_root.inst.parse_folder("[a0]:/*/dcim/camera");
+            var camera = PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim/camera");
             foreach (var f in camera.files) {
                 Console.WriteLine(f.name);
                 f.copy_sync(dest_dir);
@@ -164,7 +164,7 @@ namespace console_test
         // copies all files from this folder into a sub-folder we create
         // after we do that, we delete the sub-folder
         static void test_copy_and_delete_files(string src_path) {
-            var src = drive_root.inst.parse_folder(src_path);
+            var src = PortableDriveRoot.inst.parse_folder(src_path);
             var old_folder_count = src.child_folders.Count();
             var child_dir = src_path + "/child1/child2/child3/";
             var dest = src.drive.create_folder(child_dir);
@@ -185,8 +185,8 @@ namespace console_test
 
 
         static void test_copy_files(string src_path, string dest_path) {
-            var src = drive_root.inst.parse_folder(src_path);
-            var dest = drive_root.inst.new_folder(dest_path);
+            var src = PortableDriveRoot.inst.parse_folder(src_path);
+            var dest = PortableDriveRoot.inst.new_folder(dest_path);
             foreach (var child in src.files) {
                 Console.Write(child.full_path);
                 child.copy_sync(dest_path);
@@ -203,20 +203,20 @@ namespace console_test
             var temp_dir = new_temp_path();
             test_copy_files("[a0]:/*/dcim/facebook", temp_dir);
             test_copy_files(temp_dir, "[a0]:/*/dcim/facebook_copy");
-            drive_root.inst.parse_folder(temp_dir).delete_sync();
-            drive_root.inst.parse_folder("[a0]:/*/dcim/facebook_copy").delete_sync();            
+            PortableDriveRoot.inst.parse_folder(temp_dir).delete_sync();
+            PortableDriveRoot.inst.parse_folder("[a0]:/*/dcim/facebook_copy").delete_sync();            
         }
 
         static void test_long_android_copy(string file_name) {
             var temp_dir = new_temp_path();
-            var src_file = drive_root.inst.parse_file(file_name);
+            var src_file = PortableDriveRoot.inst.parse_file(file_name);
             src_file.copy_sync(temp_dir);
             var dest_file = temp_dir + "\\" + src_file.name;
-            Debug.Assert(src_file.size == drive_root.inst.parse_file(dest_file).size);
+            Debug.Assert(src_file.size == PortableDriveRoot.inst.parse_file(dest_file).size);
             File.Move(dest_file, dest_file + ".renamed");
-            drive_root.inst.parse_file(dest_file + ".renamed").copy_sync("[a0]:/*/dcim");
-            Debug.Assert(drive_root.inst.parse_file("[a0]:/*/dcim/" + src_file.name + ".renamed").size == src_file.size);
-            drive_root.inst.parse_file("[a0]:/*/dcim/" + src_file.name + ".renamed").delete_sync();
+            PortableDriveRoot.inst.parse_file(dest_file + ".renamed").copy_sync("[a0]:/*/dcim");
+            Debug.Assert(PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/" + src_file.name + ".renamed").size == src_file.size);
+            PortableDriveRoot.inst.parse_file("[a0]:/*/dcim/" + src_file.name + ".renamed").delete_sync();
         }
 
         static void test_bulk_copy() {
@@ -225,44 +225,44 @@ namespace console_test
             var dest_android = "[a0]:/*/dcim/bulk";
             int i = 0;
             // take "even" files
-            var src_files_win = drive_root.inst.parse_folder(src_win).files.Where(f => i++ % 2 == 0).ToList();
+            var src_files_win = PortableDriveRoot.inst.parse_folder(src_win).files.Where(f => i++ % 2 == 0).ToList();
             var src_files_size = src_files_win.Sum(f => f.size);
             // win to win
             bulk.bulk_copy_sync(src_files_win, dest_win);
-            var dest_win_size = drive_root.inst.parse_folder(dest_win).files.Sum(f => f.size);
+            var dest_win_size = PortableDriveRoot.inst.parse_folder(dest_win).files.Sum(f => f.size);
             Debug.Assert(dest_win_size == src_files_size);
 
             // win to android
             bulk.bulk_copy_sync(src_files_win, dest_android);
-            var dest_android_size = drive_root.inst.parse_folder(dest_android).files.Sum(f => f.size);
+            var dest_android_size = PortableDriveRoot.inst.parse_folder(dest_android).files.Sum(f => f.size);
             Debug.Assert(dest_android_size == src_files_size);
 
             // android to android
             i = 0;
             var dest_android_copy = "[a0]:/*/dcim/bulk_copy";
-            var src_files_android = drive_root.inst.parse_folder(dest_android).files.Where(f => i++ % 2 == 0).ToList();
+            var src_files_android = PortableDriveRoot.inst.parse_folder(dest_android).files.Where(f => i++ % 2 == 0).ToList();
             var src_files_android_size = src_files_android.Sum(f => f.size);
             bulk.bulk_copy_sync(src_files_android, dest_android_copy);
-            var dest_files_android_size = drive_root.inst.parse_folder(dest_android_copy).files.Sum(f => f.size);
+            var dest_files_android_size = PortableDriveRoot.inst.parse_folder(dest_android_copy).files.Sum(f => f.size);
             Debug.Assert(src_files_android_size == dest_files_android_size);
 
             // android to win
             var dest_win_copy = new_temp_path();
             bulk.bulk_copy_sync(src_files_android, dest_win_copy);
-            var dest_win_copy_size = drive_root.inst.parse_folder(dest_win_copy).files.Sum(f => f.size);
+            var dest_win_copy_size = PortableDriveRoot.inst.parse_folder(dest_win_copy).files.Sum(f => f.size);
             Debug.Assert(dest_win_copy_size == src_files_android_size);
 
-            drive_root.inst.parse_folder(dest_win).delete_sync();
-            drive_root.inst.parse_folder(dest_win_copy).delete_sync();
+            PortableDriveRoot.inst.parse_folder(dest_win).delete_sync();
+            PortableDriveRoot.inst.parse_folder(dest_win_copy).delete_sync();
 
-            drive_root.inst.parse_folder(dest_android).delete_sync();
-            drive_root.inst.parse_folder(dest_android_copy).delete_sync();
+            PortableDriveRoot.inst.parse_folder(dest_android).delete_sync();
+            PortableDriveRoot.inst.parse_folder(dest_android_copy).delete_sync();
         }
 
         static void test_android_disconnected() {
             var camera = "[a0]:/*/dcim/camera";
-            var camera_folder = drive_root.inst.parse_folder(camera);
-            var first_file = drive_root.inst.parse_folder(camera).files.ToList()[0];
+            var camera_folder = PortableDriveRoot.inst.parse_folder(camera);
+            var first_file = PortableDriveRoot.inst.parse_folder(camera).files.ToList()[0];
             Debug.Assert(camera_folder.exists);
             Debug.Assert(first_file.exists);
             Debug.Assert(first_file.drive.is_connected());
@@ -285,26 +285,26 @@ namespace console_test
 
         private static void test_long_android_copy_async(string file_name) {
             logger.Debug("android to win");
-            drive_root.inst.auto_close_win_dialogs = false;
+            PortableDriveRoot.inst.auto_close_win_dialogs = false;
             var temp_dir = new_temp_path();
-            var src_file = drive_root.inst.parse_file(file_name);
+            var src_file = PortableDriveRoot.inst.parse_file(file_name);
             src_file.copy_async(temp_dir);
             Thread.Sleep(15000);
 
             logger.Debug("android to android");
-            drive_root.inst.auto_close_win_dialogs = false;
+            PortableDriveRoot.inst.auto_close_win_dialogs = false;
             src_file.copy_async("[a0]:/phone/dcim");
             Thread.Sleep(15000);
 
             logger.Debug("win to android");
             var dest_file = temp_dir + "\\" + src_file.name;
             File.Move(dest_file, dest_file + ".renamed");
-            drive_root.inst.parse_file(dest_file + ".renamed").copy_async("[a0]:/phone/dcim");
+            PortableDriveRoot.inst.parse_file(dest_file + ".renamed").copy_async("[a0]:/phone/dcim");
             Thread.Sleep(15000);
 
             logger.Debug("win to win");
             var temp_dir2 = new_temp_path();
-            drive_root.inst.parse_file(dest_file + ".renamed").copy_async(temp_dir2);
+            PortableDriveRoot.inst.parse_file(dest_file + ".renamed").copy_async(temp_dir2);
             Thread.Sleep(15000);
         }
 
