@@ -52,7 +52,7 @@ namespace console_test
         } 
 
         static void traverse_drive(IDrive d, bool dump_file_count_only) {
-            Debug.Assert(d.DriveType.IsPortableDevice());
+            //Debug.Assert(d.DriveType.IsPortableDevice());
 
             var suffix = dump_file_count_only ? files_count_suffix(d.EnumerateFiles()) : "";
             Console.WriteLine("Drive " + d.UniqueId + suffix);

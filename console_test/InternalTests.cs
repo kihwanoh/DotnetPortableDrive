@@ -61,18 +61,18 @@ namespace console_test
 
         // these are EnumerateFiles() from my drive
         static void test_win_ParseFiles() {
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").Size == 4532595);
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_104952.jPg").Size == 7389360);
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("D:\\cool_pics\\a10").EnumerateFiles().Count() == 25);
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("D:\\cool_pics").EnumerateChildFolders().Count() == 8);
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").Size == 4532595);
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_104952.jPg").Size == 7389360);
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("D:\\cool_pics\\a10").EnumerateFiles().Count() == 25);
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("D:\\cool_pics").EnumerateChildFolders().Count() == 8);
 
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").FullPath == "D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg");
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("D:\\cool_pics\\a10").FullPath == "D:\\cool_pics\\a10");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").FullPath == "D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("D:\\cool_pics\\a10").FullPath == "D:\\cool_pics\\a10");
         }
 
         static void test_parent_folder() {
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").Folder.FullPath == "D:\\cool_pics\\a00\\b0\\c0");
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").Folder.Parent.FullPath == "D:\\cool_pics\\a00\\b0");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").Folder.FullPath == "D:\\cool_pics\\a00\\b0\\c0");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("D:\\cool_pics\\a00\\b0\\c0\\20161115_035718.jPg").Folder.Parent.FullPath == "D:\\cool_pics\\a00\\b0");
         }
 
 
@@ -80,33 +80,33 @@ namespace console_test
         // Android tests
 
         static void android_test_ParseFiles() {
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").Size == 4598747);
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121601.jPg").Size == 3578988);
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("[a0]:/*/dcim/camera") != null);
+           // Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").Size == 4598747);
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121601.jPg").Size == 3578988);
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFolder("[a0]:/*/dcim/camera") != null);
 
             //            Debug.Assert(drive_root.Instance.ParseFolder("[a0]:/*/dcim/camera").full_path.ToLower() == "[a0]:/*\\dcim\\camera");
         }
 
         static void android_test_parent_folder() {
             // need to care about [a0] in full_path
-            Debug.Assert(false);
+            //Debug.Assert(false);
 
             // ... uses file.parent
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").Folder.FullPath.ToLower() 
-                         == "[a0]:/*\\dcim\\camera");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").Folder.FullPath.ToLower() 
+              //           == "[a0]:/*\\dcim\\camera");
             // ... uses file.parent and folder.parent
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").Folder.Parent.FullPath.ToLower() 
-                         == "[a0]:/*\\dcim");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").Folder.Parent.FullPath.ToLower() 
+                //         == "[a0]:/*\\dcim");
 
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").FullPath.ToLower() 
-                         == "[a0]:/*\\dcim\\camera\\20171005_121557.jpg");
-            Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121601.jPg").FullPath.ToLower() 
-                         == "[a0]:/*\\dcim\\camera\\20171005_121601.jpg");            
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121557.jPg").FullPath.ToLower() 
+                  //       == "[a0]:/*\\dcim\\camera\\20171005_121557.jpg");
+            //Debug.Assert(ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/camera/20171005_121601.jPg").FullPath.ToLower() 
+                    //     == "[a0]:/*\\dcim\\camera\\20171005_121601.jpg");            
 
         }
 
         static void android_test_create_delete_folder() {
-            Debug.Assert(ExternalDriveRoot.Instance.NewFolder("[a0]:/*/dcim/testing123") != null);
+            //Debug.Assert(ExternalDriveRoot.Instance.NewFolder("[a0]:/*/dcim/testing123") != null);
             ExternalDriveRoot.Instance.ParseFolder("[a0]:/*/dcim/testing123").DeleteSync();
             try {
                 ExternalDriveRoot.Instance.ParseFolder("[a0]:/*/dcim/testing123");
@@ -126,13 +126,13 @@ namespace console_test
             var dir = new_temp_path();
             first_file.CopySync(dir);
             var name = first_file.Name;
-            Debug.Assert(first_file.Size == new FileInfo(dir + "\\" + name).Length);
+            //Debug.Assert(first_file.Size == new FileInfo(dir + "\\" + name).Length);
 
             // copy: windows to android
             var renamed = dir + "\\" + name + ".renamed.jpg";
             File.Move(dir + "\\" + name, renamed);
             ExternalDriveRoot.Instance.ParseFile(renamed).CopySync("[a0]:/*/dcim/");
-            Debug.Assert(first_file.Size == ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/" + name + ".renamed.jpg").Size);
+            //Debug.Assert(first_file.Size == ExternalDriveRoot.Instance.ParseFile("[a0]:/*/dcim/" + name + ".renamed.jpg").Size);
         }
 
 
@@ -167,8 +167,8 @@ namespace console_test
                 child.CopySync(child_dir);
             long src_size = src.EnumerateFiles().Sum(f => f.Size);
             long dest_size = dest.EnumerateFiles().Sum(f => f.Size);
-            Debug.Assert(src_size == dest_size);
-            Debug.Assert(src.EnumerateChildFolders().Count() == old_folder_count + 1);
+            //Debug.Assert(src_size == dest_size);
+            //Debug.Assert(src.EnumerateChildFolders().Count() == old_folder_count + 1);
             foreach (var child in dest.EnumerateFiles())
                 child.DeleteSync();
 
