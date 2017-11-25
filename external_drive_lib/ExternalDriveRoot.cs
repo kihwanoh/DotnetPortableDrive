@@ -45,6 +45,7 @@ namespace external_drive_lib
 
                 lock (this)
                 {
+                    if (_vidpidToUniqueId.ContainsKey(vidPid)) continue;
                     _vidpidToUniqueId.Add(vidPid, uniqueId);
                 }
             }
@@ -122,14 +123,14 @@ namespace external_drive_lib
         private void MonitorForDrive(string vidpid, int idx) {
             const int maxRetries = 10;
             var drivesNow = GetPortableDrives();
-            var found = drivesNow.FirstOrDefault(d => (d as PortableDevice).VidPid == vidpid);
+            var found = drivesNow.FirstOrDefault(d => ((PortableDevice) d).VidPid == vidpid);
             if (found != null) 
                 Refresh();
             else if (idx < maxRetries)
                 WindowsHelper.Postpone(() => MonitorForDrive(vidpid, idx + 1), 100);
             else {
                 // "can't find usb connected drive " + vidpid
-                Debug.Assert(false);
+                //Debug.Assert(false);
             }
         }
         private void DeviceAdded(Dictionary<string, string> properties)
@@ -144,7 +145,7 @@ namespace external_drive_lib
             else
             {
                 // added usb device with no PNPDeviceID
-                Debug.Assert(false);
+                //Debug.Assert(false);
             }
         }
         private void DeviceRemoved(Dictionary<string, string> properties) {
@@ -178,9 +179,12 @@ namespace external_drive_lib
         }
         private void RefreshPortableUniqueIds() {
             lock(this)
-                foreach ( PortableDevice ad in _drives.OfType<PortableDevice>())
+                foreach (PortableDevice ad in _drives.OfType<PortableDevice>())
+                {
+                    Debug.Assert(ad.VidPid != null);
                     if (_vidpidToUniqueId.ContainsKey(ad.VidPid))
                         ad.UniqueId = _vidpidToUniqueId[ad.VidPid];
+                }
         }
 
         // As drive name, use any of: 

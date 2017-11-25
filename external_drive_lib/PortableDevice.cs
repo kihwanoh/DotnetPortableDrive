@@ -18,7 +18,6 @@ namespace external_drive_lib
          * The PC uses the VID/PID combination to find the drivers (if any) that are to be used for the USB device. */
         private string _vidPid = "";
         // this portable device's unique ID - think of it as a serial number
-        private string _uniqueId = "";
 
         private bool _enumeratedChildren;
         private List<IFolder> _folders = new List<IFolder>();
@@ -30,11 +29,11 @@ namespace external_drive_lib
             _rootPath = _root.Path;
 
             if ( UsbHelpers.PortablePathToVidpid(_rootPath, ref _vidPid))
-                _uniqueId = _vidPid;
+                UniqueId = _vidPid;
             // 1.2.3+ - sometimes, we can't match vidpid to unique id (for instance, iphones). in this case, do our best and just
             //          use the unique id from the path itself
             var uniqueIdFromPath = UsbHelpers.UniqueIdFromRootPath(_rootPath);
-            if (uniqueIdFromPath != "") _uniqueId = uniqueIdFromPath;
+            if (uniqueIdFromPath != "") UniqueId = uniqueIdFromPath;
 
             DriveType = PortableDeviceHelpers.FindDriveType(_root, _friendlyName);
         }
@@ -43,17 +42,16 @@ namespace external_drive_lib
 
         public string RootName => _rootPath;
 
-        public string UniqueId
-        {
-            get => _uniqueId;
-            set => _uniqueId = value;
-        }
+        public string UniqueId { get; set; } = "";
 
         public string FriendlyName => _friendlyName;
 
         public bool UsbConnected { get; internal set; }
 
-        public string VidPid { get; internal set; }
+        public string VidPid
+        {
+            get => _vidPid;
+            internal set => _vidPid = value; }
         
         public bool IsConnected()
         {
@@ -111,7 +109,7 @@ namespace external_drive_lib
 
         public IFile TryParseFile(string path)
         {
-            var uniqueDriveId = "{" + _uniqueId + "}";
+            var uniqueDriveId = "{" + UniqueId + "}";
             if (path.StartsWith(uniqueDriveId, StringComparison.CurrentCultureIgnoreCase))
                 path = path.Substring(uniqueDriveId.Length + 2); // ignore ":\" as well
             if (path.StartsWith(_rootPath, StringComparison.CurrentCultureIgnoreCase))
@@ -131,7 +129,7 @@ namespace external_drive_lib
             path = path.Replace("/", "\\");
             if (path.EndsWith("\\"))
                 path = path.Substring(0, path.Length - 1);
-            var uniqueDriveId = "{" + _uniqueId + "}";
+            var uniqueDriveId = "{" + UniqueId + "}";
             if (path.StartsWith(uniqueDriveId, StringComparison.CurrentCultureIgnoreCase))
                 path = path.Substring(uniqueDriveId.Length + 2); // ignore ":\" as well
             if (path.StartsWith(_rootPath, StringComparison.CurrentCultureIgnoreCase))
@@ -147,7 +145,7 @@ namespace external_drive_lib
             path = path.Replace("/", "\\");
             if (path.EndsWith("\\"))
                 path = path.Substring(0, path.Length - 1);
-            var id = "{" + _uniqueId + "}:\\";
+            var id = "{" + UniqueId + "}:\\";
             var containsDrivePrefix = path.StartsWith(id, StringComparison.CurrentCultureIgnoreCase);
             if (containsDrivePrefix)
                 path = path.Substring(id.Length);
@@ -193,7 +191,7 @@ namespace external_drive_lib
                 cur = ((Folder2) cur.Parent).Self;
             }
 
-            name = "{" + _uniqueId + "}:\\" + name;
+            name = "{" + UniqueId + "}:\\" + name;
             return name;
         }
 
