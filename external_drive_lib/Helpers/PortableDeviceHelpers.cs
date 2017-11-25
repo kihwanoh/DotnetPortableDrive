@@ -6,7 +6,7 @@ using Shell32;
 
 namespace external_drive_lib.Helpers
 {
-    internal static class PortableDeviceHelpers
+    public static class PortableDeviceHelpers
     {
         public static PortableDriveType FindDriveType(FolderItem root, string friendlyName)
         {
@@ -80,7 +80,7 @@ namespace external_drive_lib.Helpers
                 || dt == PortableDriveType.IosUnknown;
         }
 
-        public static void EnumerateChildren(PortableDevice drive, FolderItem fi, List<IFolder> folders, List<IFile> files)
+        internal static void EnumerateChildren(PortableDevice drive, FolderItem fi, List<IFolder> folders, List<IFile> files)
         {
             folders.Clear();
             files.Clear();
@@ -105,12 +105,12 @@ namespace external_drive_lib.Helpers
         }
 
         // for testing
-        public static List<string> GetVerbs(FolderItem fi)
+        internal static List<string> GetVerbs(FolderItem fi)
         {
             return (from FolderItemVerb verb in fi.Verbs() select verb.Name).ToList();
         }
 
-        public static long PortableFileSize(FolderItem2 fi)
+        internal static long PortableFileSize(FolderItem2 fi)
         {
             try
             {
@@ -149,12 +149,12 @@ namespace external_drive_lib.Helpers
             }
         }
 
-        public static Folder GetMyComputer()
+        internal static Folder GetMyComputer()
         {
             return WindowsHelper.GetShell32Folder(0x11);
         }
 
-        public static List<FolderItem> GetPortableConnectedDeviceDrives()
+        internal static List<FolderItem> GetPortableConnectedDeviceDrives()
         {
             var usbDrives = new List<FolderItem>();
 
