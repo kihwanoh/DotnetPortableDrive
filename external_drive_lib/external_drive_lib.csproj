@@ -42,27 +42,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Native\DialogMoveThread.cs" />
+    <Compile Include="Helpers\PortableDeviceHelpers.cs" />
+    <Compile Include="Helpers\WmiHelpers.cs" />
+    <Compile Include="IFolder2.cs" />
+    <Compile Include="Native\Constants.cs" />
+    <Compile Include="Native\MoveDialogThread.cs" />
     <Compile Include="Native\EnumThreadWndProc.cs" />
     <Compile Include="Native\NativeMethods.cs" />
     <Compile Include="Native\Win32Windows.cs" />
-    <Compile Include="portable\PortableDevice.cs" />
-    <Compile Include="portable\portable_file.cs" />
-    <Compile Include="portable\portable_folder.cs" />
-    <Compile Include="util\portable_util.cs" />
-    <Compile Include="bulk\bulk.cs" />
-    <Compile Include="PortableDriveRoot.cs" />
-    <Compile Include="interfaces\IDrive.cs" />
-    <Compile Include="interfaces\IFile.cs" />
-    <Compile Include="interfaces\IFolder.cs" />
-    <Compile Include="monitor\find_devices.cs" />
-    <Compile Include="monitor\monitor_devices.cs" />
+    <Compile Include="PortableDriveType.cs" />
+    <Compile Include="PortableDevice.cs" />
+    <Compile Include="PortableFile.cs" />
+    <Compile Include="PortableFolder.cs" />
+    <Compile Include="PortableBulkOperation.cs" />
+    <Compile Include="ExternalDriveRoot.cs" />
+    <Compile Include="IDrive.cs" />
+    <Compile Include="IFile.cs" />
+    <Compile Include="IFolder.cs" />
+    <Compile Include="DevicesMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="util\usb_util.cs" />
-    <Compile Include="windows\win_drive.cs" />
-    <Compile Include="windows\win_file.cs" />
-    <Compile Include="windows\win_folder.cs" />
-    <Compile Include="util\win_util.cs" />
+    <Compile Include="Helpers\UsbHelpers.cs" />
+    <Compile Include="WindowsDrive.cs" />
+    <Compile Include="WindowsFile.cs" />
+    <Compile Include="WindowsFolder.cs" />
+    <Compile Include="Helpers\WindowsHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Shell32">
