@@ -17,7 +17,7 @@ namespace external_drive_lib.Native
         public static extern bool EnumChildWindows(IntPtr hwndParent, EnumThreadWndProc lpEnumFunc, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+        public static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder lpClassName, int nMaxCount);
 
         [DllImport("user32")]
         public static extern int ShowWindow(IntPtr hwnd, int nCmdShow);
