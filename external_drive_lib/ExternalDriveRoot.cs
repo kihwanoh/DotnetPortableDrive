@@ -13,24 +13,27 @@ namespace external_drive_lib
      */
     public class ExternalDriveRoot
     {
-        private static Lazy<ExternalDriveRoot> _instance = new Lazy<ExternalDriveRoot>(() => new ExternalDriveRoot());
+        private static readonly Lazy<ExternalDriveRoot> LazyInstance = new Lazy<ExternalDriveRoot>(() => new ExternalDriveRoot());
 
         // note: not all devices register as USB hubs, some only register as controller devices
-        private DevicesMonitor _monitorUsbhubDevices = new DevicesMonitor();
-        private DevicesMonitor _monitorControllerDevices = new DevicesMonitor();
-        private Dictionary<string, string> _vidpidToUniqueId = new Dictionary<string, string>();
+        private readonly DevicesMonitor _monitorUsbhubDevices = new DevicesMonitor();
+        private readonly DevicesMonitor _monitorControllerDevices = new DevicesMonitor();
+        private readonly Dictionary<string, string> _vidpidToUniqueId = new Dictionary<string, string>();
         // this includes all drives, even the internal ones
         private List<IDrive> _drives = new List<IDrive>();
 
         // ----- PROPERTIES
-        public static ExternalDriveRoot Instance => _instance.Value;
+        public static ExternalDriveRoot Instance => LazyInstance.Value;
 
         public bool AutoCloseWinDialogs { get; set; } = true;
 
-        // returns all drives, even the internal HDDs - you might need this if you want to copy a file onto an external drive
         public IReadOnlyList<IDrive> Drives
         {
-            get { lock (this) return _drives; }
+            get
+            {
+                // returns all drives, even the internal HDDs - you might need this if you want to copy a file onto an external drive
+                lock (this) return _drives;
+            }
         }
 
         // ----- CONSTRUCTOR
@@ -75,92 +78,14 @@ namespace external_drive_lib
 
             new MoveDialogThread().Start();
         }
+
         
-        private void OnNewDevice(string vidPid, string uniqueId) {
-            lock (this) {
-                if (_vidpidToUniqueId.ContainsKey(vidPid))
-                    _vidpidToUniqueId[vidPid] = uniqueId;
-                else
-                    _vidpidToUniqueId.Add(vidPid, uniqueId);
-            }
-            RefreshPortableUniqueIds();
-            var alreadyADrive = false;
-            lock (this) {
-                var ad = _drives.FirstOrDefault(d => d.UniqueId == uniqueId) as PortableDevice;
-                if (ad != null) {
-                    ad.UsbConnected = true;
-                    alreadyADrive = true;
-                }
-            }
-            if (!alreadyADrive)
-                WindowsHelper.Postpone(() => MonitorForDrive(vidPid, 0), 50);            
-        }
-        private void OnDeletedDevice(string vidPid, string uniqueId) {            
-            lock (this) {
-                var ad = _drives.FirstOrDefault(d => d.UniqueId == uniqueId) as PortableDevice;
-                if (ad != null)
-                    ad.UsbConnected = false;
-            }
-            Refresh();
-        }
 
-        private void DeviceAddedController(Dictionary<string, string> properties) {
-            if (!properties.ContainsKey("Dependent")) return;
-            var deviceId = properties["Dependent"];
-            string vidPid = "", uniqueId = "";
-            if (UsbHelpers.DependentToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId)) 
-                OnNewDevice(vidPid, uniqueId);
-        }
-        private void DeviceRemovedController(Dictionary<string, string> properties) {
-            if (!properties.ContainsKey("Dependent")) return;
-            var deviceId = properties["Dependent"];
-            string vidPid = "", uniqueId = "";
-            if (UsbHelpers.DependentToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId)) 
-                OnDeletedDevice(vidPid, uniqueId);
-        }
-
-        // here, we know the drive was connected, wait a bit until it's actually visible
-        private void MonitorForDrive(string vidpid, int idx) {
-            const int maxRetries = 10;
-            var drivesNow = GetPortableDrives();
-            var found = drivesNow.FirstOrDefault(d => ((PortableDevice) d).VidPid == vidpid);
-            if (found != null) 
-                Refresh();
-            else if (idx < maxRetries)
-                WindowsHelper.Postpone(() => MonitorForDrive(vidpid, idx + 1), 100);
-            else {
-                // "can't find usb connected drive " + vidpid
-                //Debug.Assert(false);
-            }
-        }
-        private void DeviceAdded(Dictionary<string, string> properties)
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Methods
+        
+        public void Refresh()
         {
-            if (properties.ContainsKey("PNPDeviceID"))
-            {
-                var deviceId = properties["PNPDeviceID"];
-                string vidPid = "", uniqueId = "";
-                if (UsbHelpers.PnpDeviceIdToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId))
-                    OnNewDevice(vidPid, uniqueId);
-            }
-            else
-            {
-                // added usb device with no PNPDeviceID
-                //Debug.Assert(false);
-            }
-        }
-        private void DeviceRemoved(Dictionary<string, string> properties) {
-            if (properties.ContainsKey("PNPDeviceID")) {
-                var deviceId = properties["PNPDeviceID"];
-                string vidPid = "", uniqueId = "";
-                if (UsbHelpers.PnpDeviceIdToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId)) 
-                    OnDeletedDevice(vidPid, uniqueId);                
-            } else {
-                // deleted usb device with no PNPDeviceID
-                Debug.Assert(false);
-            }
-        }
-        
-        public void Refresh() {
             List<IDrive> drivesNow = new List<IDrive>();
             try {
                 drivesNow.AddRange(GetWinDrives());
@@ -177,20 +102,11 @@ namespace external_drive_lib
             }
             RefreshPortableUniqueIds();
         }
-        private void RefreshPortableUniqueIds() {
-            lock(this)
-                foreach (PortableDevice ad in _drives.OfType<PortableDevice>())
-                {
-                    Debug.Assert(ad.VidPid != null);
-                    if (_vidpidToUniqueId.ContainsKey(ad.VidPid))
-                        ad.UniqueId = _vidpidToUniqueId[ad.VidPid];
-                }
-        }
 
-        // As drive name, use any of: 
-        // "{<unique_id>}:", "<drive-name>:", "[a<android-drive-index>]:", "[i<ios-index>]:", "[p<portable-index>]:", "[d<drive-index>]:"
         public IDrive TryGetDrive(string drivePrefix)
         {
+            // As drive name, use any of: 
+            // "{<unique_id>}:", "<drive-name>:", "[a<android-drive-index>]:", "[i<ios-index>]:", "[p<portable-index>]:", "[d<drive-index>]:"
             drivePrefix = drivePrefix.Replace("/", "\\");
             // case insensitive
             foreach (var d in Drives)
@@ -238,8 +154,8 @@ namespace external_drive_lib
             return null;
         }
 
-        // throws if drive not found
         public IDrive GetDrive(string drivePrefix) {
+            // throws if drive not found
             // case insensitive
             var d = TryGetDrive(drivePrefix);
             if ( d == null)
@@ -247,18 +163,8 @@ namespace external_drive_lib
             return d;
         }
 
-        private void SplitIntoDriveAndFolderPath(string path, out string drive, out string folderOrFile) {
-            path = path.Replace("/", "\\");
-            var endOfDrive = path.IndexOf(":\\");
-            if (endOfDrive >= 0) {
-                drive = path.Substring(0, endOfDrive + 2);
-                folderOrFile = path.Substring(endOfDrive + 2);
-            } else
-                drive = folderOrFile = null;
-        }
-
-        // returns null on failure
         public IFile TryParseFile(string path) {
+            // returns null on failure
             // split into drive + path
             string driveStr, folderOrFile;
             SplitIntoDriveAndFolderPath(path, out driveStr, out folderOrFile);
@@ -268,8 +174,8 @@ namespace external_drive_lib
             return drive.TryParseFile(folderOrFile);            
         }
 
-        // returns null on failure
         public IFolder TryParseFolder(string path) {
+            // returns null on failure
             string driveStr, folderOrFile;
             SplitIntoDriveAndFolderPath(path, out driveStr, out folderOrFile);
             if ( driveStr == null)
@@ -280,8 +186,8 @@ namespace external_drive_lib
             return drive.TryParseFolder(folderOrFile);            
         }
 
-        // throws if anything goes wrong
         public IFile ParseFile(string path) {
+            // throws if anything goes wrong
             // split into drive + path
             string driveStr, folderOrFile;
             SplitIntoDriveAndFolderPath(path, out driveStr, out folderOrFile);
@@ -293,8 +199,9 @@ namespace external_drive_lib
             return drive.ParseFile(folderOrFile);
         }
 
-        // throws if anything goes wrong
-        public IFolder ParseFolder(string path) {
+        public IFolder ParseFolder(string path)
+        {
+            // throws if anything goes wrong
             string driveStr, folderOrFile;
             SplitIntoDriveAndFolderPath(path, out driveStr, out folderOrFile);
             if ( driveStr == null)
@@ -303,8 +210,9 @@ namespace external_drive_lib
             return drive.ParseFolder(folderOrFile);
         }
 
-        // creates all folders up to the given path
-        public IFolder NewFolder(string path) {
+        public IFolder NewFolder(string path)
+        {
+            // creates all folders up to the given path
             string driveStr, folderOrFile;
             SplitIntoDriveAndFolderPath(path, out driveStr, out folderOrFile);
             if ( driveStr == null)
@@ -313,9 +221,91 @@ namespace external_drive_lib
             return drive.CreateFolder(folderOrFile);
         }
 
+        #region Event Handler
+        private void OnNewDevice(string vidPid, string uniqueId)
+        {
+            lock (this)
+            {
+                if (_vidpidToUniqueId.ContainsKey(vidPid))
+                    _vidpidToUniqueId[vidPid] = uniqueId;
+                else
+                    _vidpidToUniqueId.Add(vidPid, uniqueId);
+            }
+            RefreshPortableUniqueIds();
+            var alreadyADrive = false;
+            lock (this)
+            {
+                var ad = _drives.FirstOrDefault(d => d.UniqueId == uniqueId) as PortableDevice;
+                if (ad != null)
+                {
+                    ad.UsbConnected = true;
+                    alreadyADrive = true;
+                }
+            }
+            if (!alreadyADrive)
+                WindowsHelper.Postpone(() => MonitorForDrive(vidPid, 0), 50);
+        }
+        private void OnDeletedDevice(string vidPid, string uniqueId)
+        {
+            lock (this)
+            {
+                var ad = _drives.FirstOrDefault(d => d.UniqueId == uniqueId) as PortableDevice;
+                if (ad != null)
+                    ad.UsbConnected = false;
+            }
+            Refresh();
+        }
+
+        private void DeviceAddedController(object sender, DeviceChangedEventArgs e)
+        {
+            if (!e.AffectedDevices.ContainsKey("Dependent")) return;
+            var deviceId = e.AffectedDevices["Dependent"];
+            string vidPid = "", uniqueId = "";
+            if (UsbHelpers.DependentToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId))
+                OnNewDevice(vidPid, uniqueId);
+        }
+        private void DeviceRemovedController(object sender, DeviceChangedEventArgs e)
+        {
+            if (!e.AffectedDevices.ContainsKey("Dependent")) return;
+            var deviceId = e.AffectedDevices["Dependent"];
+            string vidPid = "", uniqueId = "";
+            if (UsbHelpers.DependentToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId))
+                OnDeletedDevice(vidPid, uniqueId);
+        }
+        private void DeviceAdded(object sender, DeviceChangedEventArgs e)
+        {
+            if (e.AffectedDevices.ContainsKey("PNPDeviceID"))
+            {
+                var deviceId = e.AffectedDevices["PNPDeviceID"];
+                string vidPid = "", uniqueId = "";
+                if (UsbHelpers.PnpDeviceIdToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId))
+                    OnNewDevice(vidPid, uniqueId);
+            }
+            else
+            {
+                // added usb device with no PNPDeviceID
+                //Debug.Assert(false);
+            }
+        }
+        private void DeviceRemoved(object sender, DeviceChangedEventArgs e)
+        {
+            if (e.AffectedDevices.ContainsKey("PNPDeviceID"))
+            {
+                var deviceId = e.AffectedDevices["PNPDeviceID"];
+                string vidPid = "", uniqueId = "";
+                if (UsbHelpers.PnpDeviceIdToVidpidAndUniqueId(deviceId, ref vidPid, ref uniqueId))
+                    OnDeletedDevice(vidPid, uniqueId);
+            }
+            else
+            {
+                // deleted usb device with no PNPDeviceID
+                Debug.Assert(false);
+            }
+        }
+        #endregion
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Portable
-
 
         private List<IDrive> GetPortableDrives() {
             var newDrives = PortableDeviceHelpers.GetPortableConnectedDeviceDrives().Select(d => new PortableDevice(d) as IDrive).ToList();
@@ -332,19 +322,60 @@ namespace external_drive_lib
             return result;
         }
 
+        private void SplitIntoDriveAndFolderPath(string path, out string drive, out string folderOrFile)
+        {
+            path = path.Replace("/", "\\");
+            var endOfDrive = path.IndexOf(":\\");
+            if (endOfDrive >= 0)
+            {
+                drive = path.Substring(0, endOfDrive + 2);
+                folderOrFile = path.Substring(endOfDrive + 2);
+            }
+            else
+                drive = folderOrFile = null;
+        }
+
+        private void RefreshPortableUniqueIds()
+        {
+            lock (this)
+                foreach (PortableDevice ad in _drives.OfType<PortableDevice>())
+                {
+                    Debug.Assert(ad.VidPid != null);
+                    if (_vidpidToUniqueId.ContainsKey(ad.VidPid))
+                        ad.UniqueId = _vidpidToUniqueId[ad.VidPid];
+                }
+        }
+
+        private void MonitorForDrive(string vidpid, int idx)
+        {
+            // here, we know the drive was connected, wait a bit until it's actually visible
+            const int maxRetries = 10;
+            var drivesNow = GetPortableDrives();
+            var found = drivesNow.FirstOrDefault(d => ((PortableDevice)d).VidPid == vidpid);
+            if (found != null)
+                Refresh();
+            else if (idx < maxRetries)
+                WindowsHelper.Postpone(() => MonitorForDrive(vidpid, idx + 1), 100);
+            else
+            {
+                // "can't find usb connected drive " + vidpid
+                //Debug.Assert(false);
+            }
+        }
+        
         // END OF Portable
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Windows
 
-        // for now, I return all drives - don't care about which is External, Removable, whatever
-
-        private List<IDrive> GetWinDrives() {
+        private List<IDrive> GetWinDrives()
+        {
+            // for now, I return all drives - don't care about which is External, Removable, whatever
             return DriveInfo.GetDrives().Select(d => new WindowsDrive(d) as IDrive).ToList();
         }
+
         // END OF Windows
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     }
 }

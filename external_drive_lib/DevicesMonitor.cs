@@ -10,8 +10,8 @@ namespace external_drive_lib
         private ManagementEventWatcher _insertedEventWatcher;
         private ManagementEventWatcher _removedEventWatcher;
 
-        public event Action<Dictionary<string, string>> DeviceAdded;
-        public event Action<Dictionary<string, string>> DeviceDeleted;
+        public event EventHandler<DeviceChangedEventArgs> DeviceAdded;
+        public event EventHandler<DeviceChangedEventArgs> DeviceDeleted;
 
         // not used yet, however, tested and works
         // examples: generic_monitor("Win32_USBHub"); generic_monitor("Win32_DiskDrive");
@@ -44,11 +44,11 @@ namespace external_drive_lib
 
                 if (ReferenceEquals(sender, _insertedEventWatcher))
                 {
-                    OnDeviceAdded(properties);
+                    OnDeviceAdded(new DeviceChangedEventArgs() {AffectedDevices = properties});
                 }
                 else
                 {
-                    OnDeviceDeleted(properties);
+                    OnDeviceAdded(new DeviceChangedEventArgs() { AffectedDevices = properties });
                 }
             }
             catch (Exception ex)
@@ -57,14 +57,14 @@ namespace external_drive_lib
             }
         }
         
-        protected virtual void OnDeviceAdded(Dictionary<string, string> obj)
+        protected virtual void OnDeviceAdded(DeviceChangedEventArgs obj)
         {
-            DeviceAdded?.Invoke(obj);
+            DeviceAdded?.Invoke(this, obj);
         }
 
-        protected virtual void OnDeviceDeleted(Dictionary<string, string> obj)
+        protected virtual void OnDeviceDeleted(DeviceChangedEventArgs obj)
         {
-            DeviceDeleted?.Invoke(obj);
+            DeviceDeleted?.Invoke(this, obj);
         }
 
         #region IDisposable Support

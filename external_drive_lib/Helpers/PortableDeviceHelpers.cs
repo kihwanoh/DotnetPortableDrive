@@ -140,14 +140,8 @@ namespace external_drive_lib.Helpers
             foreach (FolderItem fi in GetMyComputer().Items())
             {
                 var path = fi.Path;
-                try
-                {
-                    if (Directory.Exists(path) || path.Contains(":\\")) continue;
-                }
-                catch
-                {
-                    // a usb drive
-                }
+                try { if (Directory.Exists(path) || path.Contains(":\\")) continue; }
+                catch { /* a usb drive */ }
                 usbDrives.Add(fi);
             }
             return usbDrives;
