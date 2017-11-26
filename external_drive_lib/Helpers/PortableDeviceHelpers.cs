@@ -130,7 +130,7 @@ namespace external_drive_lib.Helpers
 
         internal static Folder GetMyComputer()
         {
-            return WindowsHelper.GetShell32Folder(0x11);
+            return WindowsHelper.GetShell32Folder(ShellSpecialFolderConstants.ssfDRIVES);
         }
 
         internal static List<FolderItem> GetPortableConnectedDeviceDrives()
