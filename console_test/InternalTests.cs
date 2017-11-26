@@ -303,14 +303,14 @@ namespace console_test
             Thread.Sleep(15000);
         }
 
-        private static void add_dump_info(Dictionary<string, string> properties) {
+        private static void add_dump_info(object sender, DeviceChangedEventArgs e) {
             Console.WriteLine("---------- ADDED");
-            foreach ( var p in properties)
+            foreach ( var p in e.AffectedDevices)
                 Console.WriteLine(p.Key + " [=] " + p.Value);
         }
-        private static void del_dump_info(Dictionary<string, string> properties) {
+        private static void del_dump_info(object sender, DeviceChangedEventArgs e) {
             Console.WriteLine("---------- DEL");
-            foreach ( var p in properties)
+            foreach ( var p in e.AffectedDevices)
                 Console.WriteLine(p.Key + " [=] " + p.Value);
         }
         public static void monitor_usb_devices()
