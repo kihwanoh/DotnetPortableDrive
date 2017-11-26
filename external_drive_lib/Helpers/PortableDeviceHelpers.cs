@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using external_drive_lib.Native;
 using Shell32;
 
 namespace external_drive_lib.Helpers
@@ -13,8 +15,8 @@ namespace external_drive_lib.Helpers
             var driveType = PortableDriveType.Portable;
             bool isAndroid = false, isPhone = false, isTablet = false, isApple = false, isIphone = false;
 
-            if (friendlyName.ToLower().StartsWith("apple")) isApple = true;
-            if (friendlyName.ToLower().Contains(" iphone")) isIphone = true;
+            if (friendlyName.ToLower().StartsWith(Constants.AppleDeviceName)) isApple = true;
+            if (friendlyName.ToLower().Contains(Constants.IphoneDeviceName)) isIphone = true;
 
             try
             {
@@ -29,15 +31,15 @@ namespace external_drive_lib.Helpers
                         {
                             switch (name)
                             {
-                                case "Phone":
+                                case Constants.PhoneDeviceName:
                                     isPhone = true;
                                     break;
-                                case "Tablet":
+                                case Constants.TabletDeviceName:
                                     isTablet = true;
                                     break;
                             }
                             // at this point, see if child has a sub-folder called Android
-                            isAndroid = (child.GetFolder as Folder)?.ParseName("android") != null;
+                            isAndroid = (child.GetFolder as Folder)?.ParseName(Constants.AndroidDeviceName) != null;
                         }
                     }
                 }
@@ -104,7 +106,6 @@ namespace external_drive_lib.Helpers
             }
         }
 
-        // for testing
         internal static List<string> GetVerbs(FolderItem fi)
         {
             return (from FolderItemVerb verb in fi.Verbs() select verb.Name).ToList();
@@ -112,41 +113,19 @@ namespace external_drive_lib.Helpers
 
         internal static long PortableFileSize(FolderItem2 fi)
         {
+            try { return (long)fi.ExtendedProperty("size"); }
+            catch { /* ignored */ }
             try
             {
-                return (long)fi.ExtendedProperty("size");
-            }
-            catch
-            {
-                // ignored
-            }
-            try
-            {
-                // TODO: use better approach using logarithm math
-                // this will return something like, "3.34 KB" or so
-                var sizeStr = ((Folder) fi.Parent).GetDetailsOf(fi, 2).ToLower();
+                var sizeStr = ((Folder) fi.Parent).GetDetailsOf(fi, 2).ToUpper().Trim();
+                var sizeUnit = sizeStr.Substring(sizeStr.Length - 2, 2).Trim(); // unit
+                var sizeNonConverted = sizeStr.Substring(0, sizeStr.Length - 2).Trim(); // number
 
-                var multiplyBy = 1;
-                if (sizeStr.EndsWith("kb"))
-                {
-                    multiplyBy = 1024;
-                    sizeStr = sizeStr.Substring(0, sizeStr.Length - 2);
-                }
-                else if (sizeStr.EndsWith("mb"))
-                {
-                    multiplyBy = 1024 * 1024;
-                    sizeStr = sizeStr.Substring(0, sizeStr.Length - 2);
-                }
-                sizeStr = sizeStr.Trim();
-
-                double sizeDouble;
-                double.TryParse(sizeStr, out sizeDouble);
-                return (long)(sizeDouble * multiplyBy);
-            }
-            catch
-            {
-                return -1;
-            }
+                var index = Constants.BytesSuffix.IndexOf(sizeUnit);
+                double.TryParse(sizeNonConverted, out double parsed);
+                return Convert.ToInt64(Math.Pow(1024, index) * parsed);
+            } catch { /* ignored */ }
+            return -1;
         }
 
         internal static Folder GetMyComputer()
